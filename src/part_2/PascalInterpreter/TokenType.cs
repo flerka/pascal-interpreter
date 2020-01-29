@@ -3,6 +3,6 @@ namespace PascalInterpreter
 {
     public enum TokenType
     {
-        INTEGER, PLUS, EOF
+        INTEGER, PLUS, MINUS, EOF
     }
 }
