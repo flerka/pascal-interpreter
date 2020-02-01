@@ -21,7 +21,7 @@ namespace PascalInterpreter
         /// <summary>
         /// expr -> INTEGER PLUS INTEGER
         /// </summary>
-        public int BuildExpression()
+        public int Expr()
         {
             // set current token to the first token taken from the input
             this.currentToken = GetNextToken();

@@ -25,10 +25,10 @@ namespace PascalInterpreter
         /// expr -> INTEGER PLUS INTEGER
         /// expr -> INTEGER MINUS INTEGER
         /// </summary>
-        public int BuildExpression()
+        public int Expr()
         {
             currentToken = GetNextToken();
-            var result = GetTerm();
+            var result = Factor();
 
             while (currentToken?.Type == TokenType.PLUS || currentToken?.Type == TokenType.MINUS)
             {
@@ -36,11 +36,11 @@ namespace PascalInterpreter
                 {
                     case (TokenType.PLUS):
                         Eat(TokenType.PLUS);
-                        result += GetTerm();
+                        result += Factor();
                         break;
                     case (TokenType.MINUS):
                         Eat(TokenType.MINUS);
-                        result -= GetTerm();
+                        result -= Factor();
                         break;
                 }
             }
@@ -64,16 +64,16 @@ namespace PascalInterpreter
                 switch (currentChar)
                 {
                     case ' ':
-                        this.SkipWhitespaces();
+                        this.SkipWhitespace();
                         continue;
                     case '+':
-                        UpdatePosition();
+                        Advance();
                         return new Token(TokenType.PLUS, currentChar.ToString());
                     case '-':
-                        UpdatePosition();
+                        Advance();
                         return new Token(TokenType.MINUS, currentChar.ToString());
                     case var _ when int.TryParse(currentChar.ToString(), out int number):
-                        return new Token(TokenType.INTEGER, GetMultidigitIntSubstring());
+                        return new Token(TokenType.INTEGER, Integer());
                     default:
                         throw new InvalidSyntaxException();
                 }
@@ -85,13 +85,13 @@ namespace PascalInterpreter
         /// <summary>
         /// Return a (multidigit) integer consumed from the input.
         /// </summary>
-        private string GetMultidigitIntSubstring()
+        private string Integer()
         {
             var result = string.Empty;
             while(currentChar != null && char.IsDigit(currentChar.Value))
             {
                 result += currentChar;
-                UpdatePosition();
+                Advance();
             }
 
             return result;
@@ -116,14 +116,17 @@ namespace PascalInterpreter
         /// <summary>
         /// Return an INTEGER token value.
         /// </summary>
-        private int GetTerm()
+        private int Factor()
         {
             var token = currentToken;
             Eat(TokenType.INTEGER);
             return int.Parse(token.Value);
         }
 
-        private void UpdatePosition()
+        /// <summary>
+        /// Advance the position pointer and set the currentChar variable.
+        /// </summary>
+        private void Advance()
         {
             position++;
             if (position > _text.Length - 1)
@@ -136,11 +139,11 @@ namespace PascalInterpreter
             }
         }
 
-        private void SkipWhitespaces()
+        private void SkipWhitespace()
         {
             while (this.currentChar != null && Char.IsWhiteSpace(this.currentChar.Value))
             {
-                UpdatePosition();
+                Advance();
             }
         }
     }
