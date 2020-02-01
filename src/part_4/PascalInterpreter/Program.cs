@@ -11,7 +11,7 @@ namespace PascalInterpreter
                 try
                 {
                     var text = Console.ReadLine();
-                    var interpreter = new Interpreter(text);
+                    var interpreter = new Interpreter(new Lexer(text));
                     var result = interpreter.BuildExpression();
                     Console.WriteLine(result);
                 }
