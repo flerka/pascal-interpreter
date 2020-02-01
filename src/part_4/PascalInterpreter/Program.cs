@@ -1,0 +1,25 @@
+﻿using System;
+
+namespace PascalInterpreter
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            while (true)
+            {
+                try
+                {
+                    var text = Console.ReadLine();
+                    var interpreter = new Interpreter(text);
+                    var result = interpreter.BuildExpression();
+                    Console.WriteLine(result);
+                }
+                catch(InvalidSyntaxException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+    }
+}
