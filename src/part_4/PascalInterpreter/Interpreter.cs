@@ -27,9 +27,9 @@ namespace PascalInterpreter
         /// expr -> INTEGER PLUS INTEGER
         /// expr -> INTEGER MINUS INTEGER
         /// </summary>
-            public int BuildExpression()
+        public int Expr()
         {
-            var result = GetTerm();
+            var result = Factor();
 
             while (currentToken?.Type == TokenType.MUL || currentToken?.Type == TokenType.DIV)
             {
@@ -37,11 +37,11 @@ namespace PascalInterpreter
                 {
                     case (TokenType.MUL):
                         Eat(TokenType.MUL);
-                        result *= GetTerm();
+                        result *= Factor();
                         break;
                     case (TokenType.DIV):
                         Eat(TokenType.DIV);
-                        result /= GetTerm();
+                        result /= Factor();
                         break;
                 }
             }
@@ -52,7 +52,7 @@ namespace PascalInterpreter
         /// <summary>
         /// Return an INTEGER token value.
         /// </summary>
-        private int GetTerm()
+        private int Factor()
         {
             var token = currentToken;
             Eat(TokenType.INTEGER);

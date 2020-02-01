@@ -12,7 +12,7 @@ namespace PascalInterpreter
                 {
                     var text = Console.ReadLine();
                     var interpreter = new Interpreter(new Lexer(text));
-                    var result = interpreter.BuildExpression();
+                    var result = interpreter.Expr();
                     Console.WriteLine(result);
                 }
                 catch(InvalidSyntaxException e)
