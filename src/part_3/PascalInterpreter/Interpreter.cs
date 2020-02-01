@@ -13,7 +13,6 @@ namespace PascalInterpreter
         /// <summary>
         /// Token ctr
         /// </summary>
-        /// <param name="text">string input, e.g. "3+5"</param>
         public Interpreter(string text)
         {
             this._text = text;
@@ -27,33 +26,25 @@ namespace PascalInterpreter
         /// </summary>
         public int BuildExpression()
         {
-            // set current token to the first token taken from the input
-            this.currentToken = GetNextToken();
+            currentToken = GetNextToken();
+            var result = GetTerm();
 
-            // we expect the current token to be a single-digit integer
-            var left = this.currentToken;
-            this.Eat(TokenType.INTEGER);
-
-            // we expect the current token to be a '+' token
-            var op = this.currentToken;
-            if (op.Type != TokenType.PLUS && op.Type != TokenType.MINUS)
+            while (currentToken?.Type == TokenType.PLUS || currentToken?.Type == TokenType.MINUS)
             {
-                throw new Exception();
+                switch (currentToken.Type)
+                {
+                    case (TokenType.PLUS):
+                        Eat(TokenType.PLUS);
+                        result += GetTerm();
+                        break;
+                    case (TokenType.MINUS):
+                        Eat(TokenType.MINUS);
+                        result -= GetTerm();
+                        break;
+                }
             }
-            this.Eat(op.Type);
 
-            // we expect the current token to be a single-digit integer
-            var right = this.currentToken;
-            this.Eat(TokenType.INTEGER);
-
-            // at this point either the INTEGER PLUS INTEGER or
-            // the INTEGER MINUS INTEGER sequence of tokens
-            // has been successfully found and the method can just
-            // return the result of adding or subtracting two integers,
-            // thus effectively interpreting client input
-            var leftNumber = int.Parse(left.Value);
-            var rightNumber = int.Parse(right.Value);
-            return op.Type == TokenType.MINUS ? leftNumber - rightNumber : leftNumber + rightNumber; 
+            return result;
         }
 
         /// <summary>
@@ -83,7 +74,7 @@ namespace PascalInterpreter
                     case var _ when int.TryParse(currentChar.ToString(), out int number):
                         return new Token(TokenType.INTEGER, GetMultidigitIntSubstring());
                     default:
-                        throw new Exception();
+                        throw new InvalidSyntaxException();
                 }
             }
 
@@ -115,10 +106,20 @@ namespace PascalInterpreter
         {
             if (this.currentToken.Type != tokenType)
             {
-                throw new Exception();
+                throw new InvalidSyntaxException();
             }
 
             this.currentToken = GetNextToken();
+        }
+
+        /// <summary>
+        /// Return an INTEGER token value.
+        /// </summary>
+        private int GetTerm()
+        {
+            var token = currentToken;
+            Eat(TokenType.INTEGER);
+            return int.Parse(token.Value);
         }
 
         private void UpdatePosition()

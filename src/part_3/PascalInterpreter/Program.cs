@@ -15,7 +15,7 @@ namespace PascalInterpreter
                     var result = interpreter.BuildExpression();
                     Console.WriteLine(result);
                 }
-                catch(Exception e)
+                catch(InvalidSyntaxException e)
                 {
                     Console.WriteLine(e.Message);
                 }
