@@ -9,5 +9,7 @@ namespace PascalInterpreter
         EOF = 4,
         PLUS = 5,
         MINUS = 6,
+        LPAREN = 7,
+        RPAREN = 8,
     }
 }

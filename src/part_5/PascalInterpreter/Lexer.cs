@@ -45,6 +45,12 @@ namespace PascalInterpreter
                     case '+':
                         Advance();
                         return new Token(TokenType.PLUS, _currentChar.ToString());
+                    case '(':
+                        Advance();
+                        return new Token(TokenType.LPAREN, _currentChar.ToString());
+                    case ')':
+                        Advance();
+                        return new Token(TokenType.RPAREN, _currentChar.ToString());
                     case '-':
                         Advance();
                         return new Token(TokenType.MINUS, _currentChar.ToString());

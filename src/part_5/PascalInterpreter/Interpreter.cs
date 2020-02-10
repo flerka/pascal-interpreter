@@ -36,6 +36,8 @@ namespace PascalInterpreter
                         Eat(TokenType.MINUS);
                         result -= Factor();
                         break;
+                    default:
+                        throw new InvalidSyntaxException();
                 }
             }
 
@@ -63,6 +65,8 @@ namespace PascalInterpreter
                         Eat(TokenType.DIV);
                         result /= Factor();
                         break;
+                    default:
+                        throw new InvalidSyntaxException();
                 }
             }
 
@@ -75,8 +79,20 @@ namespace PascalInterpreter
         private int Factor()
         {
             var token = _currentToken;
-            Eat(TokenType.INTEGER);
-            return int.Parse(token.Value);
+
+            switch (token.Type)
+            {
+                case TokenType.INTEGER:
+                    Eat(TokenType.INTEGER);
+                    return int.Parse(token.Value);
+                case TokenType.LPAREN:
+                    Eat(TokenType.LPAREN);
+                    var result = Expr();
+                    Eat(TokenType.RPAREN);
+                    return result;
+                default:
+                    throw new InvalidSyntaxException();
+            }
         }
 
         /// <summary>
