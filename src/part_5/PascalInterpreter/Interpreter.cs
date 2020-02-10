@@ -4,7 +4,7 @@ namespace PascalInterpreter
 {
     public class Interpreter
     {
-        private Token currentToken = null;
+        private Token _currentToken;
 
         private readonly Lexer _lexer;
 
@@ -13,35 +13,28 @@ namespace PascalInterpreter
         /// </summary>
         public Interpreter(Lexer lexer)
         {
-            if (lexer == null)
-            {
-                throw new ArgumentNullException(nameof(lexer));
-            }
-
-            _lexer = lexer;
-            currentToken = _lexer.GetNextToken();
+            _lexer = lexer ?? throw new ArgumentNullException(nameof(lexer));
+            _currentToken = _lexer.GetNextToken();
         }
 
         /// <summary>
-        /// Parser / Interpreter
-        /// expr -> INTEGER PLUS INTEGER
-        /// expr -> INTEGER MINUS INTEGER
+        /// Arithmetic expression parser / interpreter.
         /// </summary>
         public int Expr()
         {
-            var result = Factor();
+            var result = Term();
 
-            while (currentToken?.Type == TokenType.MUL || currentToken?.Type == TokenType.DIV)
+            while (_currentToken?.Type == TokenType.PLUS || _currentToken?.Type == TokenType.MINUS)
             {
-                switch (currentToken.Type)
+                switch (_currentToken.Type)
                 {
-                    case (TokenType.MUL):
-                        Eat(TokenType.MUL);
-                        result *= Factor();
+                    case TokenType.PLUS:
+                        Eat(TokenType.PLUS);
+                        result += Factor();
                         break;
-                    case (TokenType.DIV):
-                        Eat(TokenType.DIV);
-                        result /= Factor();
+                    case TokenType.MINUS:
+                        Eat(TokenType.MINUS);
+                        result -= Factor();
                         break;
                 }
             }
@@ -50,11 +43,38 @@ namespace PascalInterpreter
         }
 
         /// <summary>
+        /// Term : factor ((MUL | DIV) factor)
+        /// </summary>
+        /// <returns></returns>
+        private int Term()
+        {
+            var result = Factor();
+
+            while (_currentToken?.Type == TokenType.MUL || _currentToken?.Type == TokenType.DIV)
+            {
+                var token = _currentToken;
+                switch (token.Type)
+                {
+                    case TokenType.MUL:
+                        Eat(TokenType.MUL);
+                        result *= Factor();
+                        break;
+                    case TokenType.DIV:
+                        Eat(TokenType.DIV);
+                        result /= Factor();
+                        break;
+                }
+            }
+
+            return result;
+        }
+        
+        /// <summary>
         /// Return an INTEGER token value.
         /// </summary>
         private int Factor()
         {
-            var token = currentToken;
+            var token = _currentToken;
             Eat(TokenType.INTEGER);
             return int.Parse(token.Value);
         }
@@ -67,12 +87,12 @@ namespace PascalInterpreter
         /// </summary>
         private void Eat(TokenType tokenType)
         {
-            if (this.currentToken.Type != tokenType)
+            if (this._currentToken.Type != tokenType)
             {
                 throw new InvalidSyntaxException();
             }
 
-            this.currentToken = _lexer.GetNextToken();
+            _currentToken = _lexer.GetNextToken();
         }
     }
 }
